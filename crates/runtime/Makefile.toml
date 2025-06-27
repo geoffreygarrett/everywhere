@@ -1,0 +1,35 @@
+[tasks.test-native]
+description = "Run host‑native tests (Tokio)"
+command     = "cargo"
+args        = ["test", "--all-features"]
+
+[tasks.test-browser]
+description = "Run wasm‑bindgen tests in headless Chrome"
+script      = [
+    { name = "compile+run", command = "wasm-pack",
+    args = ["test", "--chrome", "--headless",
+        "--no-default-features", "--features", "browser"] }
+]
+
+[tasks.test-wasi]
+description = "Compile + execute tests under WASI (requires wasmtime)"
+script = [
+    # build
+    { name = "build", command = "cargo",
+    args = ["test", "--target", "wasm32-wasi",
+        "--no-run", "--no-default-features", "--features", "wasi"] },
+
+    # run every produced *.wasm with wasmtime
+    { name = "run", script = '''
+        for f in target/wasm32-wasi/debug/deps/*-*.wasm; do
+          echo "Running $f";
+          wasmtime run --dir=. "$f";
+        done
+      '''}
+]
+
+[tasks.test-all]
+dependencies = ["test-native", "test-browser", "test-wasi"]
+
+[env]
+CARGO_MAKE_EXTENDED_WORKSPACE = "true"

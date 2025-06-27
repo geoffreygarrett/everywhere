@@ -1,0 +1,41 @@
+[package]
+name        = "everywhere-net"
+version     = "0.1.0"
+edition     = "2021"
+description = "Target‑agnostic WebSocket wrapper used by everywhere‑runtime"
+license     = "MIT OR Apache-2.0"
+
+###############################################################################
+# Runtime‑feature flags (mutually exclusive)                                  #
+###############################################################################
+[features]
+default = ["native"]
+native   = ["async-tungstenite", "anyhow"]
+browser  = ["gloo-net",          "anyhow"]
+wasi     = ["soketto",           "anyhow"]
+
+###############################################################################
+# Base dependencies                                                           #
+###############################################################################
+[dependencies]
+anyhow       = { version = "1", optional = true }
+bytes        = "1"
+futures-util = { version = "0.3", default-features = false, features = ["sink","std"] }
+cfg-if       = "1.0"
+
+# back‑end impls
+async-tungstenite = { version = "0.25", features = ["tokio-runtime"], optional = true }
+gloo-net          = { version = "0.5",  features = ["websocket"],      optional = true }
+soketto           = { version = "0.7",                                  optional = true }
+tokio             = { version = "1",   features = ["net"], optional = true }
+
+###############################################################################
+# Test‑only deps (compile when `cargo test`)                                  #
+###############################################################################
+[dev-dependencies]
+#tokio             = { version = "1", features = ["macros","rt-multi-thread"] }
+#async-tungstenite = { version = "0.25", features = ["tokio-runtime"] }
+
+[target.'cfg(all(test, feature = "native"))'.dev-dependencies]
+tokio             = { version = "1", features = ["macros","rt-multi-thread"] }
+async-tungstenite = "0.25"

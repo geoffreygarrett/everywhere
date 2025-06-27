@@ -1,0 +1,49 @@
+[package]
+name = "everywhere-timer"
+version = "0.2.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Back‑off/interval helper that piggybacks on cross‑runtime."
+repository = "https://github.com/your-org/cross-timer"
+
+###############################################################################
+# Features  – mirror those of cross‑runtime so a workspace build can enable
+# exactly the same flag set for every crate.  No other knobs are needed.
+###############################################################################
+[features]
+default = ["native"]                # pick one: native | browser | wasi
+
+native = [
+    "everywhere-runtime/native",
+    "everywhere-test/native", # <─ turns on tokio inside cross-test
+#    "everywhere-test", # <─ pulls the optional dep in
+]
+
+browser = [
+    "everywhere-runtime/browser",
+    "everywhere-test/browser",
+#    "everywhere-test",
+]
+
+wasi = [
+    "everywhere-runtime/wasi",
+#    "everywhere-test/wasi",
+#    "everywhere-test",
+]
+std = []             # opt‑out gives fully no_std (+alloc)
+
+###############################################################################
+# Dependencies                                                               #
+###############################################################################
+[dependencies]
+cfg-if = "1"                           # 2 tiny macros
+spin = { version = "0.10", default-features = false, features = ["mutex", "spin_mutex"] }
+everywhere-runtime = { workspace = true, default-features = false, optional = false }
+time = "0.3.41"
+everywhere-test = { workspace = true }
+
+
+
+[dev-dependencies]
+tokio = { version = "1.37", features = ["rt", "macros", "time"] }
+wasm-bindgen-test = "0.3.50"

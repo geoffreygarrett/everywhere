@@ -1,0 +1,60 @@
+[package]
+name = "everywhere-runtime"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+
+###############################################################################
+# Optional dependencies – pulled in by the feature flags below               #
+###############################################################################
+[dependencies]
+cfg-if = "1.0"
+
+tokio = { version = "1.37", features = ["rt", "time", "sync", "macros"], optional = true }
+
+# We always enable the `std` feature so the crate contains the cross‑target
+# helpers in `futures_util::task`, even for `wasm32`.
+futures-util = { version = "0.3", default-features = false, features = ["alloc", "std", "sink"], optional = true }
+everywhere-test = { workspace = true }
+futures-channel = { version = "0.3", default-features = false, optional = true }
+gloo-timers = { version = "0.2", features = ["futures"], optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+async-std = { version = "1.12", features = ["attributes"], optional = true }
+
+# ─ WebSocket back-ends ──────────────────────────────────────────
+anyhow             = { version = "1",         optional = true }
+async-tungstenite  = { version = "0.25", features = ["tokio-runtime"], optional = true }
+gloo-net           = { version = "0.5", features = ["websocket"],      optional = true }
+soketto            = { version = "0.7",        optional = true }
+
+[features]
+default = ["native"]
+
+native = [
+    "tokio",
+    "futures-util",
+    "everywhere-test/native",
+    "anyhow",
+    "async-tungstenite",
+]
+browser = [
+    "futures-channel",
+    "futures-util",
+    "gloo-timers",
+    "wasm-bindgen-futures",
+    "everywhere-test/browser",
+    "gloo-net", "anyhow",
+]
+wasi = [
+    "futures-channel",
+    "futures-util",
+    "async-std",
+    "everywhere-test/wasi",
+    "soketto", "anyhow",
+]
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = "0.3"
+

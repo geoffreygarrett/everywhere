@@ -1,0 +1,27 @@
+[workspace]
+
+members = [
+    "crates/audio",
+    "crates/everywhere",
+    "crates/net",
+    "crates/runtime",
+    "crates/test",
+    "crates/net",
+    "crates/test-macro",
+    "crates/timer",
+]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.85.0"
+version = "0.1.0"
+authors = ["Geoffrey Garrett <26066340+geoffreygarrett@users.noreply.github.com>"]
+license = "MIT"
+
+[workspace.dependencies]
+everywhere-audio = { path = "crates/audio", default-features = false }
+everywhere-net = { path = "crates/net", default-features = false }
+everywhere-runtime = { path = "crates/runtime", default-features = false }
+everywhere-test = { path = "crates/test", default-features = false }
+everywhere-test-macro = { path = "crates/test-macro", default-features = false }
+everywhere-timer = { path = "crates/timer", default-features = false }

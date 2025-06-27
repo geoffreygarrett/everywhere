@@ -1,0 +1,48 @@
+[package]
+name        = "everywhere-test"
+version     = "0.1.0"
+edition     = "2021"
+license     = "MIT OR Apache-2.0"
+description = "One attribute to run async tests on native, browser, or WASI."
+keywords    = ["testing", "tokio", "wasm", "wasi"]
+categories  = ["development-tools::testing", "wasm", "asynchronous"]
+
+###############################################################################
+# Runtime-specific dependencies (all optional, turned on by features below)  #
+###############################################################################
+[dependencies]
+everywhere-test-macro = { workspace = true }
+
+tokio = { version = "1", features = ["rt", "macros"] }
+
+# async-std and wasm-bindgen-test build fine on non-Wasm targets, so no need
+# for cfg tricks — Cargo simply won’t compile them unless their feature is on.
+#async-std         = { version = "1", features = ["attributes"] }
+wasm-bindgen-test = { version = "0.3" }
+
+###############################################################################
+# Exactly ONE of these features must be enabled by the parent crate          #
+###############################################################################
+[features]
+default = [
+#    "wasm-bindgen-test",
+#    "tokio"
+]                     # parent crate decides which runtime
+#
+native = []
+browser = []
+wasi = []
+#native = [
+#    "tokio",
+#    "everywhere-test-macro/native"    # forward flag to the proc-macro crate
+#]
+#
+#browser = [
+#    "wasm-bindgen-test",
+#    "everywhere-test-macro/browser"
+#]
+#
+#wasi = [
+#    "async-std",
+#    "everywhere-test-macro/wasi"
+#]

@@ -1,0 +1,60 @@
+[package]
+name = "everywhere"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "One-stop re-export for everywhere-* crates (net, runtime, timer, …)."
+
+###############################################################################
+# Optional deps – we keep them feature-less here and re-enable through         #
+# the `[features]` table below.                                                #
+###############################################################################
+[dependencies]
+everywhere-net = { workspace = true, default-features = false, optional = true }
+everywhere-runtime = { workspace = true, default-features = false, optional = true }
+everywhere-timer = { workspace = true, default-features = false, optional = true }
+everywhere-test = { workspace = true, default-features = false, optional = true }
+everywhere-audio = { workspace = true, default-features = false, optional = true }
+
+###############################################################################
+# Feature matrix                                                               #
+# ───────────────────────────────────────────────────────────────────────────── #
+#  • “component” features toggle whole sub-crates                              #
+#  • “target”   features forward to *all* enabled components                   #
+#  • “all” enables every component                                             #
+###############################################################################
+[features]
+# ---- high-level “what do I need?” ------------------------------------------
+net = ["everywhere-net"]
+runtime = ["everywhere-runtime"]
+timer = ["everywhere-timer"]
+test = ["everywhere-test"]
+audio = ["everywhere-audio"]
+
+all = ["net", "runtime", "timer", "test", "audio"]
+
+# ---- target triples (mutually exclusive) -----------------------------------
+native = [
+    "everywhere-net/native",
+    "everywhere-runtime/native",
+    "everywhere-timer/native",
+    "everywhere-test/native",
+    # everywhere-audio is host-only, no extra flags
+]
+
+browser = [
+    "everywhere-net/browser",
+    "everywhere-runtime/browser",
+    "everywhere-timer/browser",
+    "everywhere-test/browser",
+]
+
+wasi = [
+    "everywhere-net/wasi",
+    "everywhere-runtime/wasi",
+    "everywhere-timer/wasi",
+    "everywhere-test/wasi",
+]
+
+# pick *something* sensible for cargo add everywhere
+default = ["all", "native"]
