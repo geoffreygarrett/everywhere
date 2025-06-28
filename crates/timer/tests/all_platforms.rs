@@ -6,9 +6,9 @@ use core::{
 };
 use std::sync::Arc;
 
+use everywhere_runtime::time;
 use everywhere_test::cross_test;
 use everywhere_timer::Timer;
-use everywhere_runtime::time;
 
 /// Convenience awaitable sleep.
 async fn wait(ms: u64) { time::sleep(Duration::from_millis(ms)).await; }
@@ -18,7 +18,7 @@ async fn wait(ms: u64) { time::sleep(Duration::from_millis(ms)).await; }
 #[cross_test]
 async fn fires_exactly_once() {
     let hit = Arc::new(AtomicUsize::new(0));
-    let h   = hit.clone();
+    let h = hit.clone();
 
     Timer::new(move || { h.fetch_add(1, Ordering::Relaxed); },
                |_| Duration::from_millis(5))
@@ -43,7 +43,7 @@ async fn reset_clears_counter() {
 #[cross_test]
 async fn tries_and_hits_match_multiple_calls() {
     let hit = Arc::new(AtomicUsize::new(0));
-    let t   = {
+    let t = {
         let h = hit.clone();
         Timer::new(move || { h.fetch_add(1, Ordering::Relaxed); },
                    |_| Duration::from_millis(1))
@@ -77,7 +77,7 @@ async fn clone_shares_counter() {
 #[cross_test]
 async fn base_sleep_waits_long_enough() {
     let base = Duration::from_millis(4);
-    let t    = Timer::new(|| {}, move |_| base);
+    let t = Timer::new(|| {}, move |_| base);
 
     let before = std::time::Instant::now();
     t.sleep().await;
@@ -93,6 +93,7 @@ async fn base_sleep_does_not_panic() {
 
 /*──────────── monotonic back‑off ───────────*/
 
+/*──────────── monotonic back-off ───────────*/
 #[cross_test]
 async fn backoff_is_monotonic() {
     use std::sync::Mutex;
@@ -100,7 +101,7 @@ async fn backoff_is_monotonic() {
 
     let timer = {
         let s = stamps.clone();
-        Timer::new(move || s.lock().unwrap().push(now_ms()),
+        Timer::new(move || s.lock().unwrap().push(epoch_ms()),
                    |n| Duration::from_millis(2 * n as u64))
     };
 
@@ -110,7 +111,7 @@ async fn backoff_is_monotonic() {
     let v = stamps.lock().unwrap();
     assert!(v[0] < v[1] && v[1] < v[2]);
 }
-fn now_ms() -> u128 { std::time::Instant::now().elapsed().as_millis() }
+use everywhere_runtime::time::{epoch_ms, now_ms};
 
 /*──────────── JoinHandle (native only) ───────────*/
 
@@ -118,7 +119,7 @@ fn now_ms() -> u128 { std::time::Instant::now().elapsed().as_millis() }
 #[cross_test]
 async fn joinhandle_completes_ok() {
     let done = Arc::new(AtomicUsize::new(0));
-    let d    = done.clone();
+    let d = done.clone();
 
     let jh = Timer::new(move || { d.store(1, Ordering::Relaxed); },
                         |_| Duration::from_millis(1))

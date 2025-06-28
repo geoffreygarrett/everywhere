@@ -29,10 +29,14 @@ async-tungstenite  = { version = "0.25", features = ["tokio-runtime"], optional 
 gloo-net           = { version = "0.5", features = ["websocket"],      optional = true }
 soketto            = { version = "0.7",        optional = true }
 
+instant = { version = "0.1", default-features = false, features = ["wasm-bindgen"], optional = true }
+js-sys = { version = "0.3.77", optional = true }
+
 [features]
 default = ["native"]
 
 native = [
+    "instant",
     "tokio",
     "futures-util",
     "everywhere-test/native",
@@ -40,14 +44,17 @@ native = [
     "async-tungstenite",
 ]
 browser = [
+    "instant",
     "futures-channel",
     "futures-util",
     "gloo-timers",
+    "js-sys",
     "wasm-bindgen-futures",
     "everywhere-test/browser",
     "gloo-net", "anyhow",
 ]
 wasi = [
+    "instant",
     "futures-channel",
     "futures-util",
     "async-std",

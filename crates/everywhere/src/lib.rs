@@ -35,16 +35,16 @@ compile_error!(
 );
 
 /*──────────────────── component re-exports ───────────────────*/
+#[cfg(feature = "audio")]
+pub use everywhere_audio   as audio;
 #[cfg(feature = "net")]
 pub use everywhere_net     as net;
 #[cfg(feature = "runtime")]
 pub use everywhere_runtime as runtime;
-#[cfg(feature = "timer")]
-pub use everywhere_timer   as timer;
 #[cfg(feature = "test")]
 pub use everywhere_test    as test;
-#[cfg(feature = "audio")]
-pub use everywhere_audio   as audio;
+#[cfg(feature = "timer")]
+pub use everywhere_timer   as timer;
 
 /*──────────────────── convenience glob ───────────────────────*/
 /// Conveniences for the common trio – pull in what 90 % of binaries need.

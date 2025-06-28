@@ -44,3 +44,26 @@ pub fn output_config(dev: &cpal::Device) -> Result<StreamConfig> {
     cfg.buffer_size = BufferSize::Fixed(FRAME_SAMPLES as u32);
     Ok(cfg)
 }
+
+// //! Public, backend‑agnostic view of the low‑level device helpers.
+// //
+// //! All the real work is done in `audio::backend::*`.
+//
+// pub use crate::audio::backend::{
+//     OPUS_SR_HZ, FRAME_SAMPLES,
+//     input_config, output_config,
+// };
+//
+// /// Convenience enum kept for source compatibility.
+// pub enum DeviceProfile {
+//     MonoIn48,
+//     StereoOut48,
+// }
+// impl DeviceProfile {
+//     pub fn open(&self, dev: &cpal::Device) -> anyhow::Result<cpal::StreamConfig> {
+//         match self {
+//             Self::MonoIn48    => input_config(dev),
+//             Self::StereoOut48 => output_config(dev),
+//         }
+//     }
+// }

@@ -33,15 +33,7 @@ use spin::Mutex;
 
 /*──────────── handle alias ───────────*/
 type Handle = <Rt as Runtime>::JoinHandle;
-
-// /*──────────── internal helpers ───────*/
-// fn spawn<F>(f: F) -> Handle
-// where
-//     F: Future<Output = ()> +         // Send only on native
-//     cfg_if::cfg_if! { if #[cfg(target_arch = "wasm32")] { } else { Send + } } 'static,
-// {
-// task::spawn(f)
-// }
+pub type TimerHandle = Handle;
 
 /*──────────── timer struct ───────────*/
 
@@ -88,12 +80,10 @@ impl Timer {
 
     /// Schedule the callback after the next back‑off interval.
     pub fn schedule_timeout(&self) -> Handle {
-        let tries = self.tries.clone();
+        let n = self.tries.fetch_add(1, Ordering::Relaxed) + 1;
         let calc = self.calc.clone();
         let cb = self.cb.clone();
-
         task::spawn(async move {
-            let n = tries.fetch_add(1, Ordering::Relaxed) + 1;
             time::sleep((calc)(n)).await;
             if let Some(mut g) = cb.try_lock() { (g)(); }
         })
